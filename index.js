@@ -66,7 +66,7 @@ async function scrape() {
                     createdAt: JSON.stringify(date.toLocaleDateString("default")+'  '+ date.toLocaleTimeString("default") + ' local time'),
                     description: JSON.stringify(response?.json.itemList[index].desc),
                     enriched: false,
-                    imageURL: '',
+                    imageURL: JSON.stringify(response?.json.itemList[index].video.cover),
                     likesCount: JSON.stringify(response?.json.itemList[index].stats.diggCount),
                     location: '',
                     socialMedia: 'tiktok',
