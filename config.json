@@ -1,0 +1,8 @@
+
+{
+"TiKApiKey":"y3jm0epqVxg5OM6fbzYN2ZTdEdFPgDenDP2SckbBCwRHA7OH",
+"TiKAccountKey":"LRPUqcHRG5TIDPtrQVi71xtQPkhNnjYvwdnbUuoSVXsqcz53",
+"PathToFirebaseCredentials":"./ambassador-gpt-firebase-adminsdk-cg7lv-de44a82a8a.json",
+"firebaseDbUrl":"https://ambassador-gpt-default-rtdb.europe-west1.firebasedatabase.app/",
+"scrapeFrequency":300000
+}
