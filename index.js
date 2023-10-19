@@ -71,20 +71,20 @@ async function scrape() {
                 var date = new Date((response?.json.itemList[index].createTime)*1000);
                 //push relevant scraped data to data array declared earlier
                 data.push({
-                    author: JSON.stringify(response?.json.itemList[index].author.uniqueId),
-                    authorLink: 'https://www.tiktok.com/' + response?.json.itemList[index].author.uniqueId,
-                    commentsCount: JSON.stringify(response?.json.itemList[index].stats.commentCount),
-                    createdAt: JSON.stringify(date.toLocaleDateString("default")+'  '+ date.toLocaleTimeString("default") + ' local time'),
+                    author: JSON.stringify(response?.json.itemList[index].author.uniqueId).toString(),
+                    authorLink: 'https://www.tiktok.com/@' + response?.json.itemList[index].author.uniqueId,
+                    commentsCount: JSON.stringify(response?.json.itemList[index].stats.commentCount).toString(),
+                    createdAt: JSON.stringify(date.toLocaleDateString("default")+'  '+ date.toLocaleTimeString("default") + ' local time').toString(),
                     description: description,
                     enriched: false,
-                    imageURL: JSON.stringify(response?.json.itemList[index].video.cover),
-                    likesCount: JSON.stringify(response?.json.itemList[index].stats.diggCount),
+                    imageURL: JSON.stringify(response?.json.itemList[index].video.cover).toString(),
+                    likesCount: JSON.stringify(response?.json.itemList[index].stats.diggCount).toString(),
                     location: '',
                     socialMedia: 'tiktok',
                     type: 'post',
-                    uid: JSON.stringify(response?.json.itemList[index].author.uniqueId),
-                    url: 'https://www.tiktok.com/' + response?.json.itemList[index].author.uniqueId + '/' + response?.json.itemList[index].id,
-                    videoUrl: 'https://www.tiktok.com/' + response?.json.itemList[index].author.uniqueId + '/' + response?.json.itemList[index].id,
+                    uid: JSON.stringify(response?.json.itemList[index].author.uniqueId).toString(),
+                    url: 'https://www.tiktok.com/@' + response?.json.itemList[index].author.uniqueId + '/video/' + response?.json.itemList[index].id,
+                    videoUrl: 'https://www.tiktok.com/@' + response?.json.itemList[index].author.uniqueId + '/video/' + response?.json.itemList[index].id,
                 })
             }
         }
@@ -142,7 +142,7 @@ function scraper() {
                         )
                     .set(result[index])
                     .then(()=>{
-                        console.log('posts sussessfuly scraped: '+ (successIndex+1).toString());
+                        console.log('posts successfuly scraped: '+ (successIndex+1).toString());
                         successIndex++;
                         postQuant--;
                         if(postQuant<=0){
