@@ -1,8 +1,8 @@
 
 {
-"TiKApiKey":"y3jm0epqVxg5OM6fbzYN2ZTdEdFPgDenDP2SckbBCwRHA7OH",
-"TiKAccountKey":"LRPUqcHRG5TIDPtrQVi71xtQPkhNnjYvwdnbUuoSVXsqcz53",
-"PathToFirebaseCredentials":"./ambassador-gpt-firebase-adminsdk-cg7lv-de44a82a8a.json",
-"firebaseDbUrl":"https://ambassador-gpt-default-rtdb.europe-west1.firebasedatabase.app/",
-"scrapeFrequency":300000
+"TikApiKey":"#YOUR_TIKAPI_KEY",
+"TikAccountKey":"#ACCOUNT_KEY_OF_LINKED_TIKTOK_ACCOUNT", 
+"PathToFirebaseCredentials":"#PATH_TO_LOCAL_FIREBASE_CREDENTIALS_JSON",
+"firebaseDbUrl":"#FIREBASE_DATABASE_URL",
+"scrapeFrequency":"#INTERVAL_BETWEEN_SCRAPES_IN_MILLISECONDS"
 }
