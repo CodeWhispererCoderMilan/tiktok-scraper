@@ -1,7 +1,15 @@
+//file read/write API
+const fs = require('fs');
+
 //import configurations
 var CONFIG = require('./config.json');
+
+//time
+const date= new Date();
+
 //emojo library
 const emoji = require('node-emoji');
+
 //connect tikAPI scrapeAPI & specific user
 const TikAPI = require('tikapi').default;
 const api = TikAPI(CONFIG.TikApiKey);
@@ -17,22 +25,18 @@ var scrapeNr = 0;
 //init AFFIN testing using npm package sentiment
 const sentiment = require('multilang-sentiment');
 
-//***********
-
-
-//connect firebase admin SDK & database using npm package firebase-admin
-var admin = require("firebase-admin");
-
-var serviceAccount = require(CONFIG.PathToFirebaseCredentials);
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: CONFIG.firebaseDbUrl
-});
-var db = admin.database();
 
 //***********
 
+//AFINN function for checking if text has negative emotion in any of multiple languages
+function AFINN(text, languages){
+    var bool = false;
+    for (l in languages){
+        const aux = bool || (sentiment(text, languages[l]).score<0);
+        bool =aux;
+    }
+    return bool;
+}
 
 /*
 Declare async function scrape that uses tikAPI to scrape tik tok For You page posts of specified user
@@ -45,44 +49,38 @@ async function scrape() {
         //data is used as a temporary variable to store all relevant posts from scraping
         var data = new Array();
         /*
-        iterate thtough succsesfuly retrieved data filtering content based on
+        iterate through succsesfuly retrieved data filtering content based on
          AFINN score (must be negative, also working on multiple languages) and
          popularity (times played and ammount of comments)
          */
         for (var index = 0; index < response?.json.itemList.length; index++) {
-            const description = JSON.stringify(response?.json.itemList[index].desc);
-            const AFINNscoreEnglish = sentiment(description, 'en').score;
-            const AFINNscoreArabic = sentiment(description,'ar').score;
-            const AFINNscorePersian = sentiment(description,'fa').score;
-            const keywords = [
-                'gaza','Gaza','GAZA','غزة','غزه','palestine','Palestine',
-                'PALESTINE','فلسطین','فلسطين','احتلال','تصرف','jihad','Jihad',
-                'JIHAD','جهاد','الجهاد', ,'zion','Zion','ZIONIST', 'صهيوني',
-                'صهیونیست','jew','Jew','JEW','یهودی','اليهودي','يهود','یهودیان','🇵🇸'
-            ]
-            const hasKeywords = keywords.some(word => description.includes(word));
+            const description = response?.json.itemList[index].desc;
+            //boolean checking negative emotion in description
+            const AFINNisNegative =AFINN(description,CONFIG.languages);
+            //boolean check if post has at least one of these keywords
+            const hasKeywords = CONFIG.keywords.some(word => description.includes(word));
+            //if that filters posts that fulfill AGINN , keywords, commentcount, playcount
             if (
-                (Number(JSON.stringify(response?.json.itemList[index].stats.commentCount)) > 10) &&
-                (Number(JSON.stringify(response?.json.itemList[index].stats.playCount)) > 20) &&
-                ((AFINNscoreEnglish < 0)||(AFINNscorePersian < 0)||(AFINNscoreArabic < 0)) && hasKeywords
-
+                (Number(response?.json.itemList[index].stats.commentCount) > CONFIG.minimumComments) &&
+                (Number(response?.json.itemList[index].stats.playCount) > CONFIG.minimumPlays) &&
+                AFINNisNegative && hasKeywords
             ) {
                 //convert UNIX date to local date and time
                 var date = new Date((response?.json.itemList[index].createTime)*1000);
                 //push relevant scraped data to data array declared earlier
                 data.push({
-                    author: JSON.stringify(response?.json.itemList[index].author.uniqueId).toString(),
+                    author: response?.json.itemList[index].author.uniqueId,
                     authorLink: 'https://www.tiktok.com/@' + response?.json.itemList[index].author.uniqueId,
-                    commentsCount: JSON.stringify(response?.json.itemList[index].stats.commentCount).toString(),
-                    createdAt: JSON.stringify(date.toLocaleDateString("default")+'  '+ date.toLocaleTimeString("default") + ' local time').toString(),
+                    commentsCount: response?.json.itemList[index].stats.commentCount,
+                    createdAt: date.toLocaleDateString("default")+"  "+ date.toLocaleTimeString("default"),
                     description: description,
                     enriched: false,
-                    imageURL: JSON.stringify(response?.json.itemList[index].video.cover).toString(),
-                    likesCount: JSON.stringify(response?.json.itemList[index].stats.diggCount).toString(),
+                    imageURL: response?.json.itemList[index].video.cover,
+                    likesCount: response?.json.itemList[index].stats.diggCount,
                     location: '',
                     socialMedia: 'tiktok',
                     type: 'post',
-                    uid: JSON.stringify(response?.json.itemList[index].author.uniqueId).toString(),
+                    uid: response?.json.itemList[index].author.uniqueId,
                     url: 'https://www.tiktok.com/@' + response?.json.itemList[index].author.uniqueId + '/video/' + response?.json.itemList[index].id,
                     videoUrl: 'https://www.tiktok.com/@' + response?.json.itemList[index].author.uniqueId + '/video/' + response?.json.itemList[index].id,
                 })
@@ -99,75 +97,59 @@ async function scrape() {
 };
 
 /*
-Function for converting UTC t0 GMT+3
-*/
-function addHours(date, hours) {
-    date.setTime(date.getTime() + hours * 60 * 60 * 1000);
-  
-    return date;
-  }
-
 /*
-Declare async recursive function scraper to scrape periodically, and, once scrape is complete, push data returned by scrape to
-firebase db
+Declare async recursive function scraper to scrape periodically,
+and, once scrape is complete, write data to a new file (created 
+for each run) and show data in terminal
+
 */
 
-function scraper() {
-        //attempt scraping, wait for completion, then send returned result to firebase DB one by one through update method
+async function  scraper() {
+        
         try{
-        scrape()
-            .then((result) => {
                 scrapeNr++;
                 var failIndex=0;
                 var successIndex=0;
                 var postNr=1;
-                var postQuant=result.length;
-                for (var index = 0; index < result.length; index++){
-                    const date= new Date();
-                    var now_utc = Date.UTC(
-                        date.getUTCFullYear(), date.getUTCMonth(),
-                        date.getUTCDate(), date.getUTCHours(),
-                        date.getUTCMinutes(), date.getUTCSeconds()
-                        );
-                    var date_utc = new Date(now_utc);
-                    var israelTime =addHours(date_utc,3);
-                    //var NYTime=addHours(date_utc,-4);
-                    
-
-                    db.ref('/posts')
-                    .child(
-                        "tiktok post nr "+(postNr++)+ " out of "+result.length+" from scrape nr " +scrapeNr+" at Israeli Time: "
-                        +israelTime.getDate()+"-"+israelTime.getMonth()+"-"+israelTime.getFullYear()
-                        + " at "+israelTime.getHours()+":"+israelTime.getMinutes()
-                        )
-                    .set(result[index])
-                    .then(()=>{
-                        console.log('posts successfuly scraped: '+ (successIndex+1).toString());
-                        successIndex++;
-                        postQuant--;
-                        if(postQuant<=0){
-                            console.log('scrape nr '+scrapeNr+' complete, scraping again in ' +(CONFIG.scrapeFrequency/60000).toFixed(2)+ ' minutes...')
-                        };
-                    })
-                    .catch((err)=>{
-                        console.log('posts failed to retrieve: '+failIndex.toString()+' latest error: ' + JSON.stringify(err?.message));
-                        failIndex++;
-                        postQuant--;
-                        if(postQuant<=0){
-                            console.log('scrape nr '+scrapeNr+' complete, scraping again in ' +(CONFIG.scrapeFrequency/60000).toFixed(2)+ ' minutes...')
-                        };
-                    })
-                    ;
+                result = await scrape();
+                var postQuant = result?.length;
+                
+                for (var index = 0; index < result?.length; index++){
+                   
+                    fs.appendFile((
+                        "scrape_"+date.getDate()+
+                        "-"+date.getMonth()+"-"+date.getFullYear()+
+                        "_"+date.getHours()+"-"+date.getMinutes()
+                        ),(
+                        "scrape nr " +scrapeNr+" tiktok post nr "+(postNr++)+ 
+                        " out of "+result?.length+"\n"+JSON.stringify(result[index]) +"\n"
+                    ),(err) => { 
+                        if (err) { 
+                            console.log('posts failed to retrieve: '+failIndex.toString()+' latest error: ' + err);
+                            failIndex++;
+                            postQuant--;
+                            if(postQuant<=0){
+                                console.log('scrape nr '+scrapeNr+' complete, scraping again in ' +(CONFIG.scrapeFrequency/60000).toFixed(2)+ ' minutes...')
+                            };
+                        }else{
+                            console.log("scrape nr "+scrapeNr+' posts successfuly scraped: '+ (successIndex+1).toString()+", latest post:\n");
+                            console.log(
+                                JSON.stringify(result[result.length-postQuant])+"\n\n"
+                            )
+                            successIndex++;
+                            postQuant--;
+                            if(postQuant<=0){
+                                console.log('scrape nr '+scrapeNr+' complete, scraping again in ' +(CONFIG.scrapeFrequency/60000).toFixed(2)+ ' minutes...\n')
+                            };
+                        }
+                    });
                 }
+            }catch(err){
+                return (err?.statusCode, err?.message, err?.json);  
+            } 
 
 
-            })
-        }
-            catch(err){
-                console.log('error occured scraping again in '+(CONFIG.scrapeFrequency/60000).toFixed(2)+' min...');
-            };
-
-    //After scrape wait  base on scrapeFrequency from configurations recursively repeat function
+    //After scrape wait  based on scrapeFrequency from configurations recursively repeat function
     setTimeout(scraper, CONFIG.scrapeFrequency);
 };
 

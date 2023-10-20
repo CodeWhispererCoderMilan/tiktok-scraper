@@ -1,8 +1,10 @@
 
 {
-"TikApiKey":"#YOUR_TIKAPI_KEY",
-"TikAccountKey":"#ACCOUNT_KEY_OF_LINKED_TIKTOK_ACCOUNT", 
-"PathToFirebaseCredentials":"#PATH_TO_LOCAL_FIREBASE_CREDENTIALS_JSON",
-"firebaseDbUrl":"#FIREBASE_DATABASE_URL",
-"scrapeFrequency":"#INTERVAL_BETWEEN_SCRAPES_IN_MILLISECONDS"
+"TikApiKey":"lNNxMxVYbv8MuUqTcIqILS9xPApSUrO1kQQFHu8gjlXhvzgH",
+"TikAccountKey":"LRPUqcHRG5TIDPtrQVi71xtQPkhNnjYvwdnbUuoSVXsqcz53",
+"scrapeFrequency":10000,
+"keywords":["gaza","Gaza","GAZA","غزة","غزه","palestine","Palestine","PALESTINE","فلسطین","فلسطين","احتلال","تصرف","jihad","Jihad","JIHAD","جهاد","الجهاد","zion","Zion","ZION", "صهيوني","صهیونیست","jew","Jew","JEW","یهودی","اليهودي","يهود","یهودیان","🇵🇸"],
+"languages":["en","fa","ar"],
+"minimumComments":20,
+"minimumPlays":10
 }
