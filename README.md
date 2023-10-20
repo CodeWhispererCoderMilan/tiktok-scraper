@@ -2,17 +2,22 @@
 Manual
 
 General:
+
         This here is a tiktok scraper that retrieves data from a user's fyp, using tikAPI with any linked tiktokAccount. After retrieval, scraped posts are filtered based on:
-                1. # of comments
-                2. # of plays
-                3. negative AFINN score in at least 1 of multiple languages chosen by you.
-                4. Keywords, which are an array of strings you choose. If one or more are found in post description, it will be SCRAPED!!!!
+                        1. # of comments
+                        2. # of plays
+                        3. negative AFINN score in at least 1 of multiple languages chosen by you.
+                        4. Keywords, which are an array of strings you choose. If one or more are found in post description, it will be SCRAPED!!!!
         After scraping relevant posts will be stored in stringified JSON in the local file(a new file is generated upon each run), the file is named "scrape_#LOCALDATE_#LOCALTIME".
         "#LOCALTIME","#LOCALDATE" represent time and date of machine hosting scraper. Upon successful writing to file , post data is shown in terminal. 
         Upon Completion of first round of scraping, scraper waits and interval of time, set by you, then scrapes again, recursively, endlessly streaming posts.
 Supported Languages:
 
-        "af","am","ar","az","be","bg","bn","bs","ca","ceb","co","cs","cy","da","de","el","en","eo","es","et","eu","fa","fi", "fr","fy","ga","gd","gl","gu","ha","haw","hi","hmn","hr","ht","hu","hy","id","ig","is","it","iw","ja","jw","ka","kk", "km","kn","ko","ku","ky","la","lb","lo","lt","lv","mg","mi","mk","ml","mn","mr","ms","mt","my","ne","nl","no","ny", "pa","pl","ps","pt","ro","ru","sd","si","sk","sl","sm","sn","so","sq","sr","st","su","sv","sw","ta","te","tg","th", "tl","tr","uk","ur","uz","vi","xh","yi","yo","zh-tw","zh","zu"
+        "af","am","ar","az","be","bg","bn","bs","ca","ceb","co","cs","cy","da","de","el","en","eo","es","et","eu","fa","fi",                                               
+        "fr","fy","ga","gd","gl","gu","ha","haw","hi","hmn","hr","ht","hu","hy","id","ig","is","it","iw","ja","jw","ka","kk",         
+        "km","kn","ko","ku","ky","la","lb","lo","lt","lv","mg","mi","mk","ml","mn","mr","ms","mt","my","ne","nl","no","ny", 
+        "pa","pl","ps","pt","ro","ru","sd","si","sk","sl","sm","sn","so","sq","sr","st","su","sv","sw","ta","te","tg","th", 
+        "tl","tr","uk","ur","uz","vi","xh","yi","yo","zh-tw","zh","zu"
 
 Prerequisites: 
 
