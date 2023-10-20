@@ -8,6 +8,7 @@ General:
                         2. # of plays
                         3. negative AFINN score in at least 1 of multiple languages chosen by you.
                         4. Keywords, which are an array of strings you choose. If one or more are found in post description, it will be SCRAPED!!!!
+                        
         After scraping relevant posts will be stored in stringified JSON in the local file(a new file is generated upon each run), the file is named "scrape_#LOCALDATE_#LOCALTIME".
         "#LOCALTIME","#LOCALDATE" represent time and date of machine hosting scraper. Upon successful writing to file , post data is shown in terminal. 
         Upon Completion of first round of scraping, scraper waits and interval of time, set by you, then scrapes again, recursively, endlessly streaming posts.
