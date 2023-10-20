@@ -4,6 +4,7 @@ Manual
 General:
 
         This here is a tiktok scraper that retrieves data from a user's fyp, using tikAPI with any linked tiktokAccount. After retrieval, scraped posts are filtered based on:
+                        
                         1. # of comments
                         2. # of plays
                         3. negative AFINN score in at least 1 of multiple languages chosen by you.
